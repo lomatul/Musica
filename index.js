@@ -10,6 +10,7 @@ import session from "express-session";
 
 
 
+
 const port = process.env.PORT || 4000;
 const app = express();
 dotenv.config();
@@ -41,6 +42,14 @@ app.use(cookieParser());
 app.use(cors({origin:"http://localhost:3000", credentials: true}));
 
 
+import routes  from "./routes/auth.routes.js";
+
+
+app.use(routes);
+// const ensureAuthenticated = require("./middlewares/auth.middleware");
+// app.get("/welcome", ensureAuthenticated, (req, res) => {
+//   res.sendFile(__dirname + "/views/homePage.html");
+// });
 
 
 app.use((err, req, res, next)=>{
