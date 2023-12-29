@@ -1,9 +1,8 @@
-const project = require("../dataModels/project.model");
-const path = require("path");
-const bcrypt = require("bcrypt");
-const passport = require("passport");
-const playlist= require("../dataModels/Playlist.model");
-const song= require("../dataModels/Song.model");
+import path from "path";
+import bcrypt from "bcrypt";
+import passport from "passport";
+import song  from "../dataModels/Song.model.js";
+
 
 
 
@@ -46,7 +45,7 @@ const getplaylist = async (req, res) => {
   
 
 
-const postproject = async (req, res, next) => {
+const postsong = async (req, res, next) => {
     const { project_name, description, user_name } = req.body;
   
     console.log(project_name);
@@ -199,38 +198,27 @@ const postMultipleImages = async (req, res) => {
 };
 
 
-const getMultipleImages = async (req, res) => {
-  try {
-
-    const projectID = req.params.id;
-    const projectInfo = await project.findById(projectID);
-    const images= projectInfo.images
-
-    res.json({ images });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
 
 
-const postAudioFile = async (req, res) => {
+
+export const postSongFile = async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: 'No file provided' });
     }
    const audio = req.file.filename
-    
-   const projectID = req.params.id;
-    const projectInfo = await project.findById(projectID);
-    console.log(projectInfo)
+   const {  songname, artistname, genre } = req.body;
 
+   const newSong = new song({
+    songname,
+    artistname,
+    genre,
+    songpath:audio,
+  });
+  
+  await newSong.save();
 
-    if (audio) {
-      projectInfo.audio = audio
-    }
-    await projectInfo.save();
-
-    res.json({ message: 'Audio updated successfully' });
+    res.status(200).json({ message: 'Audio updated successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -276,15 +264,3 @@ const getMultipleAudios = async (req, res) => {
 
 
 
-module.exports = {
-  getproject,
-  postproject,
-  updateproject,
-  deleteproject,
-  postProjectIcon,
-  postMultipleImages,
-  getMultipleImages,
-  postAudioFile,
-  postMultipleAudios,
-  getMultipleAudios
-};
