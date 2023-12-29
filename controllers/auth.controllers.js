@@ -66,7 +66,7 @@ if (errors.length > 0) {
               newUser
                 .save()
                 .then(() => {
-                  res.redirect("/login");
+                  res.status(200).json({message:"Welcome to Musica" });
                 })
                 .catch(() => {
                   errors.push("Please try again");

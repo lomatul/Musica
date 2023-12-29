@@ -5,7 +5,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import passport from "passport";
 import session from "express-session";
-// import {initializepassport} from "./config/passport.js";
+import {initializepassport} from "./config/passport.js";
 
 
 
@@ -32,10 +32,10 @@ app.use(session({
   saveUninitialized: true ,
 }))
 
-// initializepassport(passport)
-// app.use(passport.initialize());
+initializepassport(passport)
+app.use(passport.initialize());
 
-// app.use(passport.session()) ;
+app.use(passport.session()) ;
 
 app.use(express.json()); 
 app.use(cookieParser());
