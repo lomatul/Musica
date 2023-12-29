@@ -41,7 +41,7 @@ const audioStorage = multer.diskStorage({
 const uploadAudioFile = multer({
   preservePath: true,
   storage: audioStorage,
-  fileFilter: audioFileFilter,
+  audioFileFilter,
 });
 
 export { uploadProfileImage, uploadAudioFile };
