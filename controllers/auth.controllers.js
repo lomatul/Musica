@@ -6,7 +6,48 @@ import User  from "../dataModels/User.model.js";
 
 
 
+export const getScope = passport.authenticate("google", {
+  scope: ["email", "profile"]
+}
+);
 
+
+// export const getCallback = passport.authenticate("google", {
+//   successRedirect: "/User/welcome",
+//   failureRedirect: "/User/google/failure",
+//   successFlash: true,
+//   failureFlash: true
+// });
+
+export const getCallback = (req, res, next) => {
+  passport.authenticate("google", (err, user, info) => {
+    if (err) {
+      console.error("Authentication error:", err);
+      return res.status(500).json({ error: "Authentication error" });
+    }
+
+    if (!user) {
+      console.error("Authentication failed:", info.message);
+      return res.status(401).json({ error: info.message });
+    }
+    req.logIn(user , (err) => {
+      console.log("User is set", user);
+      if(err){
+        console.error(err)
+        return res.status(500).json({ error: "Session is not set" });
+      }
+      else{
+        return res.status(200).json({ message: "Logged In", User: user });
+      }
+    }
+    )
+    // console.log("check", req.isAuthenticated());
+    console.log("user checked", req.user);
+    // console.log("if session is set", req.user)
+    // Authentication succeeded
+    
+  })(req, res, next);
+}
 
 
 export const postLogin = (req, res, next) => {

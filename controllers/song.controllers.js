@@ -184,7 +184,6 @@ const getMultipleAudios = async (req, res) => {
 export const searchResult = async (req, res) => {
   try{
       const query= req.query.data
-
       const result = await song.find({$text : {$search: query}}).sort({score: { $meta: "textScore" }}).limit(20);
 
       if(result.length===0){
