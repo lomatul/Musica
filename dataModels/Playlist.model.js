@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const PlaylistSchema = new mongoose.Schema({
 
@@ -10,7 +10,7 @@ const PlaylistSchema = new mongoose.Schema({
     type: String,
     default:' ',
   },
-  user_name:{
+  user:{
     type: String,
   },
 
@@ -28,5 +28,5 @@ const PlaylistSchema = new mongoose.Schema({
   
 });
 
-const Playlist = mongoose.model("Playlist", PlaylistSchema);
-module.exports = Playlist;
+PlaylistSchema.index({playlistname: 'text' })
+export default mongoose.model("Playlist", PlaylistSchema);

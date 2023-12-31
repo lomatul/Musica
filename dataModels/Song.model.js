@@ -13,15 +13,17 @@ const SongSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  playlistname:{
-    type:[String ],
-    default:'',
+  songtype: {
+    type: String,
+    default:'MP3',
   },
-  songpath: {
-  type: String,
+  playlistname:{
+    type:String,
+    default:'',
   }
 
   
 });
 
-export default  mongoose.model("Song", SongSchema);
+SongSchema.index({songname: 'text' })
+export default mongoose.model("Song", SongSchema);

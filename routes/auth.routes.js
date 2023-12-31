@@ -7,6 +7,8 @@ import {
     getProfileInfos,
     deleteProfile,
     logout,
+    getCallback,
+    getScope
     } from "../controllers/auth.controllers.js";
 
 
@@ -17,6 +19,9 @@ router.get("/logout", logout);
 router.get("/profiles", getProfileInfos);
 router.patch("/update-profile",  updateProfile);
 router.delete("/delete-profile/:id", deleteProfile);
+
+router.get("/auth/google", getScope);
+router.get("/google/callback",getCallback);
 
 
 
