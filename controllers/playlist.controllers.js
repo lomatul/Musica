@@ -1,15 +1,18 @@
-const playlist= require("../dataModels/Playlist.model");
+import Playlist from "../dataModels/Playlist.model.js";
 
 
 
-const getplaylist = async (req, res) => {
-    const playlistowner=req.user.name
+export const getplaylist = async (req, res) => {
+    const playlistowner=req.user.id;
+    if(!playlistowner){
+      return res.status(400).json({Error:"You are not Logged in. Login first"});
+    }
     try {
-      const playlist=await project.find({user_name:playlistowner})
+      const playlist=await project.find({user:playlistowner})
       if(!playlist){
-        res.status(404).json({message:"This user has no playlist"})
+        return res.status(404).json({message:"This user has no playlist"})
       }else{
-        res.status(200).json(playlist)
+        return res.status(200).json(playlist)
       }
         } catch (error) {
       console.log("Error: ", error)
@@ -18,25 +21,28 @@ const getplaylist = async (req, res) => {
   }
 
 
-  const postplaylist = async (req, res, next) => {
-    const { playlist_name, description, user_name } = req.body;
-  
+export  const postplaylist = async (req, res, next) => {
+    const { playlist_name, description } = req.body;
+    const playlistowner=req.user.id;
     console.log(playlist_name);
     console.log(description);
-  
+    console.log(playlistowner);
     const errors = [];
   
     if (!playlist_name || !description) {
       errors.push("All fields are required!");
     }
+    if(!playlistowner){
+      return res.status(400).json({Error:"You are not Logged in. Login first"});
+    }
   
     if (errors.length > 0) {
       res.status(400).json({ error: errors });
     } else {            
-          const newPlaylist = new playlist({
+          const newPlaylist = new Playlist({
             project_name,
             description,
-            user_name,
+            playlistowner,
           });
           newPlaylist
             .save()
@@ -55,13 +61,15 @@ const getplaylist = async (req, res) => {
   
 
 
-    const updateplaylist = async (req, res) => {
+export const updateplaylist = async (req, res) => {
         try {
           const { playlist_name, description } = req.body;    
-          const playlistId = req.playlist.id
-          const playlist = await playlist.findById(playlistId);
+          const playlistId = req.params.id
+          const playlist = await Playlist.findById(playlistId);
           console.log(playlist)
-      
+          if(!playlist){
+            return res.status(404).json({message:"No such playlist found"})
+          }      
         if(playlist_name)
         {
           playlist.playlistname = playlist_name;
@@ -82,10 +90,10 @@ const getplaylist = async (req, res) => {
       
 
 
-      const deleteproject = async (req, res) => {
+      export  const deleteplaylist = async (req, res) => {
         try {
           const playlistId = req.params.id;
-          const playlistInfo = await playlist.findById(playlistId);
+          const playlistInfo = await Playlist.findById(playlistId);
           console.log(playlistId);
       
           if (!playlistInfo) {
@@ -94,7 +102,7 @@ const getplaylist = async (req, res) => {
       
           await playlistInfo.deleteOne({ _id: playlistId });
       
-          res.json({ message: "Profile information deleted successfully" });
+          res.json({ message: "Playlist deleted successfully" });
         } catch (error) {
           console.log(error);
           res.status(500).json({ error: error.message });
@@ -103,7 +111,7 @@ const getplaylist = async (req, res) => {
 
 
 
-      const postPlaylistIcon = async (req, res) => {
+      export    const postPlaylistIcon = async (req, res) => {
         try {
           if (!req.file) {
             return res.status(400).json({ message: 'No file provided' });
@@ -125,12 +133,82 @@ const getplaylist = async (req, res) => {
         }
       };
 
+export const addsongtoplaylist = async(req, res) => {
+  try{
+    const playlistId = req.params.id;
+    const {Songs} = req.body;
+    const playlistInfo = await Playlist.findById(playlistId);
+    if (!playlistInfo) {
+      return res.status(404).json({ error: "Playlist information not found" });
+    }
+    if(!playlistInfo.user==req.user.id){
+      return res.status(404).json({ error: "Wrong Author" });
+  }
+    if (Array.isArray(Songs)) {
+      const uniqueSongs = Songs.filter(song => !playlistInfo.songs.includes(song));
+      playlistInfo.songs.push(...uniqueSongs);
+    } else {
+      if(playlistInfo.songs.includes(Songs)){
+        return res.status(404).json({ error: "This song is already in your playlist" });
+      }playlistInfo.songs.push(Songs)
+    }
+    await playlistInfo.save();
+    return res.status(200).json({ message:"Songs added succesfully", Playlist:playlistInfo });
+  }catch(error){
+    console.log(error);
+    res.status(400).json({error:error.message});
+  }
 
-      module.exports = {
-        getplaylist,
-        postplaylist,
-        updateplaylist,
-        deleteproject,
-        postPlaylistIcon
-      };
-      
+}
+
+
+export const removesong = async (req, res) => {
+  try {
+    const playlistId = req.params.id;
+    const { Songs } = req.body;
+    const playlistInfo = await Playlist.findById(playlistId);
+
+    if (!playlistInfo) {
+      return res.status(404).json({ error: "Playlist information not found" });
+    }
+
+    if (!playlistInfo.user == req.user.id) {
+      return res.status(404).json({ error: "Wrong Author" });
+    }
+
+    if (Array.isArray(Songs)) {
+      const updatedSongs = playlistInfo.songs.filter(song => !Songs.includes(song));
+      playlistInfo.songs = updatedSongs;
+    } else {
+      if (playlistInfo.songs.includes(Songs)) {
+        playlistInfo.songs = playlistInfo.songs.filter(song => song !== Songs);
+      } else {
+        return res.status(404).json({ error: "This song is not in your playlist" });
+      }
+    }
+
+    await playlistInfo.save();
+    return res.status(200).json({ message: "Songs removed successfully", Playlist: playlistInfo });
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ error: error.message });
+  }
+};
+
+export const searchResult = async (req, res) => {
+  try{
+      const query= req.query.data
+
+      const result = await Playlist.find({$text : {$search: query}}).sort({score: { $meta: "textScore" }}).limit(20);
+
+      if(result.length===0){
+          return res.status(200).json({message:"No resluts found"});
+      }
+  
+      return res.status(200).json({Result: result});
+  }catch(error){
+      console.log(error);
+      res.status(400).json({error:error.message});
+  }
+
+}
