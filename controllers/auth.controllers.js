@@ -10,10 +10,31 @@ import User  from "../dataModels/User.model.js";
 
 
 export const postLogin = (req, res, next) => {
-  passport.authenticate("local", {
-    successRedirect: "/media-pages",
-    failureRedirect: "/login",
-    failureFlash: true,
+  passport.authenticate("local", (err, user, info) => {
+    if (err) {
+      console.error("Authentication error:", err);
+      return res.status(500).json({ error: "Authentication error" });
+    }
+
+    if (!user) {
+      console.error("Authentication failed:", info.message);
+      return res.status(401).json({ error: info.message });
+    }
+    user.password = undefined;
+    req.logIn(user , (err) => {
+      console.log("User is set", user);
+      if(err){
+        console.error(err)
+        return res.status(500).json({ error: "Session is not set" });
+      }
+      else{
+        res.status(200).json({ message: "Logged In", User: user });
+      }
+    }
+    )
+    console.log("user checked", req.user);
+    
+    
   })(req, res, next);
 };
 
@@ -82,6 +103,14 @@ if (errors.length > 0) {
 };
 
 
+
+export const logout = (req, res) => {
+  req.logout((err) => {
+    if (err) {
+      res.json({ error: err });
+    } else res.status(200).json({ message: "Logged out" });
+  });
+};
 
 
 

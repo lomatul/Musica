@@ -1,23 +1,18 @@
-const project = require("../dataModels/project.model");
-const path = require("path");
-const bcrypt = require("bcrypt");
-const passport = require("passport");
-const playlist= require("../dataModels/Playlist.model");
-const song= require("../dataModels/Song.model");
+import song  from "../dataModels/Song.model.js";
 
 
 
 
 
-const getsong = async (req, res) => {
+export const getsong = async (req, res) => {
   
   const songowner=req.user.name
   try {
-    const project=await project.find({user_name:projectowner})
-    if(!project){
+    const song=await song.find({user_name:songowner})
+    if(!song){
       res.status(404).json({message:"This user has no project"})
     }else{
-      res.status(200).json(project)
+      res.status(200).json(song)
     }
       } catch (error) {
     console.log("Error: ", error)
@@ -27,95 +22,58 @@ const getsong = async (req, res) => {
 
 
 
-const getplaylist = async (req, res) => {
-  
-    const playlistowner=req.user.name
-    try {
-      const project=await project.find({user_name:projectowner})
-      if(!project){
-        res.status(404).json({message:"This user has no project"})
-      }else{
-        res.status(200).json(project)
-      }
-        } catch (error) {
-      console.log("Error: ", error)
-      res.status(400).json({error: error.message})
-    }
-  }
 
-  
-
-
-const postproject = async (req, res, next) => {
-    const { project_name, description, user_name } = req.body;
-  
-    console.log(project_name);
-    console.log(description);
-  
-    const errors = [];
-  
-    if (!project_name || !description) {
-      errors.push("All fields are required!");
-    }
-  
-    if (errors.length > 0) {
-      res.status(400).json({ error: errors });
-    } else {
- 
-      
-         
-          const newProject = new project({
-            project_name,
-            description,
-            user_name,
-          });
-          newProject
-            .save()
-            .then(() => {
-              res.json({
-                message: "Project created",
-              });
-            })
-            .catch(() => {
-              errors.push("Please try again");
-              res.status(400).json({ error: errors });
-            });
-        }
-    
-    };
-  
-  
-
-
-
-
-
-
-
-
-
-const updateproject = async (req, res) => {
+export const postSongFile = async (req, res) => {
   try {
-    const { project_name, description } = req.body;    
-    const projectId = req.project.id
-    const project = await project.findById(projectId);
-    console.log(project)
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file provided' });
+    }
+   const audio = req.file.filename
+   const {  songname, artistname, genre } = req.body;
 
-  if(project_name)
-  {
-    project.project_name = project_name;
+   const newSong = new song({
+    songname,
+    artistname,
+    genre,
+    songpath:audio,
+  });
+  
+  await newSong.save();
+
+    res.status(200).json({ message: 'Audio updated successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-
-  if(description)
-  {
-    project.description= description;
-  }
+};
 
 
+export const updatesong = async (req, res) => {
+  try {
+    const { songname, artistname, genre } = req.body;
+    const songId = req.params.id;
 
-    await project.save();
+    // Rename the constant variable to avoid naming conflict
+    const foundSong = await song.findById(songId);
 
-    res.json({ message: 'project information updated successfully' });
+    if (!foundSong) {
+      return res.status(404).json({ msg: 'Song not found' });
+    }
+
+    if (songname) {
+      foundSong.songname = songname;
+    }
+
+    if (artistname) {
+      foundSong.artistname = artistname;
+    }
+
+    if (genre) {
+      foundSong.genre = genre;
+    }
+
+    await foundSong.save();
+
+    res.status(200).json({ message: 'Song information updated successfully' });
   } catch (err) {
     return res.status(500).json({ msg: err.message });
   }
@@ -132,19 +90,22 @@ const updateproject = async (req, res) => {
 
 
 
-const deleteproject = async (req, res) => {
-  try {
-    const projectID = req.params.id;
-    const projectInfo = await project.findById(projectID);
-    console.log(projectID);
 
-    if (!projectInfo) {
-      return res.status(404).json({ error: "Project information not found" });
+
+
+export const deletesong = async (req, res) => {
+  try {
+    const songID = req.params.id;
+    const songInfo = await song.findById(songID);
+    console.log(songID);
+
+    if (!songInfo) {
+      return res.status(404).json({ error: "Song information not found" });
     }
 
-    await projectInfo.deleteOne({ _id: projectID });
+    await songInfo.deleteOne({ _id: songID });
 
-    res.json({ message: "Profile information deleted successfully" });
+    res.json({ message: "Song information deleted successfully" });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: error.message });
@@ -152,113 +113,55 @@ const deleteproject = async (req, res) => {
 };
 
 
-const postProjectIcon = async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ message: 'No file provided' });
-    }
-    const photo = req.file.filename
-    
-    const projectID = req.params.id;
-    const projectInfo = await project.findById(projectID);
-    console.log(projectID)
 
 
-    if (photo) {
-      projectInfo.profile_image = photo
-    }
-    await projectInfo.save();
+// export const postMultipleSongs = async (req, res) => {
+//   try {
+//     if (!req.files) {
+//       return res.status(400).json({ message: 'No file provided' });
+//     }
 
-    res.json({ message: 'Profile image updated successfully' });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-
-const postMultipleImages = async (req, res) => {
-  try {
-    if (!req.files) {
-      return res.status(400).json({ message: 'No file provided' });
-    }
-
-    const photo = req.files.map((file) => file.filename);
-
-    const projectID = req.params.id;
-    const projectInfo = await project.findById(projectID);
+//     const song = req.files.map((file) => file.filename);
+//     const songID = req.params.id;
+//     const songInfo = await Song.findById(songID);
    
-    if (photo) {
-      projectInfo.images = projectID.images.concat(photo);
-    }
-    await projectInfo.save();
+//     if (song) {
+//       songInfo.images = songID.images.concat(photo);
+//     }
+//     await songInfo.save();
 
-    res.json({ message: 'Multiple images updated successfully' });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-
-const getMultipleImages = async (req, res) => {
-  try {
-
-    const projectID = req.params.id;
-    const projectInfo = await project.findById(projectID);
-    const images= projectInfo.images
-
-    res.json({ images });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-
-const postAudioFile = async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ message: 'No file provided' });
-    }
-   const audio = req.file.filename
-    
-   const projectID = req.params.id;
-    const projectInfo = await project.findById(projectID);
-    console.log(projectInfo)
-
-
-    if (audio) {
-      projectInfo.audio = audio
-    }
-    await projectInfo.save();
-
-    res.json({ message: 'Audio updated successfully' });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+//     res.json({ message: 'Multiple images updated successfully' });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
 
 
 
-const postMultipleAudios = async (req, res) => {
-  try {
-    if (!req.files) {
-      return res.status(400).json({ message: 'No file provided' });
-    }
 
-    const audio = req.files.map((file) => file.filename);
 
-    const projectID = req.params.id;
-    const projectInfo = await project.findById(projectID);
-   
-    if (audio) {
-      projectInfo.audios = user.audios.concat(audio);
-    }
-    await projectInfo.save();
 
-    res.json({ message: 'Multiple audios updated successfully' });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+
+// const postMultipleAudios = async (req, res) => {
+//   try {
+//     if (!req.files) {
+//       return res.status(400).json({ message: 'No file provided' });
+//     }
+
+//     const audio = req.files.map((file) => file.filename);
+//     const songID = req.params.id;
+//     const songInfo = await Song.findById(songID);
+       
+//     if (audio) {
+//       songInfo.audios = user.audios.concat(audio);
+//     }
+//     await songInfo.save();
+
+//     res.json({ message: 'Multiple audios updated successfully' });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
 
 
 const getMultipleAudios = async (req, res) => {
@@ -276,15 +179,40 @@ const getMultipleAudios = async (req, res) => {
 
 
 
-module.exports = {
-  getproject,
-  postproject,
-  updateproject,
-  deleteproject,
-  postProjectIcon,
-  postMultipleImages,
-  getMultipleImages,
-  postAudioFile,
-  postMultipleAudios,
-  getMultipleAudios
-};
+
+
+export const searchResult = async (req, res) => {
+  try{
+      const query= req.query.data
+
+      const result = await song.find({$text : {$search: query}}).sort({score: { $meta: "textScore" }}).limit(20);
+
+      if(result.length===0){
+          return res.status(200).json({message:"No resluts found"});
+      }
+  
+      return res.status(200).json({Result: result});
+  }catch(error){
+      console.log(error);
+      res.status(400).json({error:error.message});
+  }
+
+}
+
+export const searchbyartist = async (req, res) => {
+  try{
+      const artist= req.query.data
+
+      const result = await song.find({artistname:artist});
+
+      if(result.length===0){
+          return res.status(200).json({message:"No resluts found"});
+      }
+  
+      return res.status(200).json({Result: result});
+  }catch(error){
+      console.log(error);
+      res.status(400).json({error:error.message});
+  }
+
+}

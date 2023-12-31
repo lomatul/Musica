@@ -43,9 +43,10 @@ app.use(cors({origin:"http://localhost:3000", credentials: true}));
 
 
 import routes  from "./routes/auth.routes.js";
-
+import songroutes  from "./routes/song.routes.js";
 
 app.use(routes);
+app.use(songroutes);
 // const ensureAuthenticated = require("./middlewares/auth.middleware");
 // app.get("/welcome", ensureAuthenticated, (req, res) => {
 //   res.sendFile(__dirname + "/views/homePage.html");

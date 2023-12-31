@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const SongSchema = new mongoose.Schema({
   
@@ -13,17 +13,15 @@ const SongSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  songtype: {
-    type: String,
-    default:'MP3',
-  },
   playlistname:{
-    type:String,
+    type:[String ],
     default:'',
+  },
+  songpath: {
+  type: String,
   }
 
   
 });
 
-const Song = mongoose.model("Song", SongSchema);
-module.exports = Song;
+export default  mongoose.model("Song", SongSchema);
