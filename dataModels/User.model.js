@@ -16,6 +16,9 @@ const UserSchema = new mongoose.Schema({
   profile_image: {
     type: String,
     default:'',
+  },
+  otppassword :{
+    type: String,
   }
 
   

@@ -3,6 +3,8 @@ import bcrypt from "bcrypt";
 import passport from "passport";
 import User  from "../dataModels/User.model.js";
 import Admin from "../dataModels/admin.model.js";
+import forgetpassword from "../config/nodemailer.js"
+import otpgenerator from "otp-generator";
 
 
 
@@ -110,9 +112,48 @@ export const AdminLogin = (req, res, next) => {
 
 
 
+export const getOTP = async(req, res) => {
+  try{
+    const {email} = req.body
+    const user= await User.findOne({email:email});
+    if(!user){
+      return res.status(400).json({error:"No user Found"});        
+    }
+    const otp=otpgenerator.generate(12,{ upperCaseAlphabets: true, lowerCaseAlphabets: true, specialChars: false })
+    user.otppassword=otp;
+    await user.save();
+    await forgetpassword(user.name, email, otp);
+    return res.status(200).json({message:"Varification mail is sent. please check your mail"});
 
+  }
+  catch (error) {
+    console.log("Error: ", error);
+    return res.status(400).json({ error: error.message });
+  }
+}
 
-
+export const newpasswordcreate = async (req, res) => {
+  try{
+    const {otp, email, newpassword} = req.body;
+    const user= await User.findOne({email:email});
+    if(!user){
+      return res.status(400).json({error:"No user Found"});        
+    }
+    if(!user.otppassword===otp){
+      return res.status(400).json({error:"OTP didn't match"});        
+    }
+    const salt = await bcrypt.genSalt(10);
+    const hashedNewPassword = await bcrypt.hash(newpassword, salt);
+    user.password=hashedNewPassword;
+    user.otppassword=null;
+    await user.save();
+    return res.status(200).json({message:"Password Updated"});
+  }
+  catch (error) {
+    console.log("Error: ", error);
+    return res.status(400).json({ error: error.message });
+  }
+}
 
 
 export const postRegister = async (req, res, next) => {
@@ -167,6 +208,30 @@ if (errors.length > 0) {
     }
   });
 }
+};
+
+
+export const postProfileImage = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file provided' });
+    }
+    const photo = req.file.filename
+    
+    const userId = req.user.id
+    const user = await User.findById(userId);
+    console.log(user)
+
+
+    if (photo) {
+      user.profile_image = photo
+    }
+    await user.save();
+
+    res.json({ message: 'Profile image updated successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
 
@@ -248,6 +313,7 @@ export const getProfileInfos = async (req, res) => {
   }
 };
 
+
 export const getProfile = async (req, res) => {
   try {
     const profileID = req.params.id;
@@ -257,6 +323,11 @@ export const getProfile = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+
+
+
+
 
 
 

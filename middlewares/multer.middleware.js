@@ -27,6 +27,21 @@ const profileImage = multer.diskStorage({
   },
 });
 
+
+
+const playlisticon = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads");
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${uuidv4()}-${Date.now()}${path.extname(file.originalname)}`);
+  },
+});
+
+
+const uploadPlaylisticon = multer({ storage: playlisticon, fileFilter });
+
+
 const uploadProfileImage = multer({ storage: profileImage, fileFilter });
 
 const audioStorage = multer.diskStorage({
@@ -44,4 +59,4 @@ const uploadAudioFile = multer({
   audioFileFilter,
 });
 
-export { uploadProfileImage, uploadAudioFile };
+export { uploadProfileImage, uploadAudioFile , uploadPlaylisticon };

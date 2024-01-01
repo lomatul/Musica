@@ -3,7 +3,7 @@ import Playlist from "../dataModels/Playlist.model.js";
 
 
 export const getplaylist = async (req, res) => {
-    const playlistowner=req.user.id;
+    const playlistowner=req.params.id;
     if(!playlistowner){
       return res.status(400).json({Error:"You are not Logged in. Login first"});
     }
@@ -28,7 +28,7 @@ export const getplaylist = async (req, res) => {
       return res.status(400).json({Error:"Playlist id not provided"});
     }
     try {
-      const playlist =await Playlist.find({user:playlistid})
+      const playlist =await Playlist.findById(playlistid)
       if(!playlist){
         return res.status(404).json({message:"playlist not found"})
       }else{
@@ -135,7 +135,7 @@ export const updateplaylist = async (req, res) => {
 
 
 
-      export    const postPlaylistIcon = async (req, res) => {
+      export   const postPlaylistIcon = async (req, res) => {
         try {
           if (!req.file) {
             return res.status(400).json({ message: 'No file provided' });
@@ -143,7 +143,7 @@ export const updateplaylist = async (req, res) => {
           const photo = req.file.filename
           
           const playlistId = req.params.id;
-          const playlistInfo = await project.findById(playlistId);
+          const playlistInfo = await Playlist.findById(playlistId);
           console.log(playlistId)
      
           if (photo) {
@@ -157,9 +157,12 @@ export const updateplaylist = async (req, res) => {
         }
       };
 
+
+
 export const addsongtoplaylist = async(req, res) => {
   try{
     const playlistId = req.params.id;
+    console.log("playlist", playlistId);
     const {Songs} = req.body;
     const playlistInfo = await Playlist.findById(playlistId);
     if (!playlistInfo) {

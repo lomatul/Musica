@@ -12,11 +12,20 @@ import {
 
     } from "../controllers/playlist.controllers.js";
 
-
+    import {
+        uploadPlaylisticon, 
+        } from "../middlewares/multer.middleware.js";
+    
+    
+        
 router.post("/postplaylist", postplaylist)
+router.get("/getplaylist/:id", getplaylist)
+router.get("/playlistsongs/:id", playlistsongs)
 router.patch("/updateplaylist/:id",updateplaylist);
 router.delete("/deleteplaylist",deleteplaylist);
 router.post("/addsongtoplaylist/:id", addsongtoplaylist)
-router.post("/removesong/:id", removesong)
+router.delete("/removesong/:id", removesong)
+
+router.post('/upload/postPlaylistIcon/:id', uploadPlaylisticon.single('file'), postPlaylistIcon);
 
 export default router;

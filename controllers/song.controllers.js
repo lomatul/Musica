@@ -1,5 +1,8 @@
 import song  from "../dataModels/Song.model.js";
-
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import path from 'path';
+import { error } from "console";
 
 
 
@@ -78,6 +81,18 @@ export const deletesong = async (req, res) => {
     }
 
     await songInfo.deleteOne({ _id: songID });
+    // const __filename = fileURLToPath(import.meta.url);
+    // const __dirname = path.dirname(__filename);
+    // const tempDir = path.join(__dirname, '../uploads');
+    // const filePath = path.join(tempDir,  songInfo.songpath);
+    // console.log(filePath);
+
+    // fs.unlink(filePath, (err)=>{
+    //     if(err){
+    //         // return res.status(400).json({error:err.message});
+    //         throw err
+    //     }
+    // });
 
     res.json({ message: "Song information deleted successfully" });
   } catch (error) {

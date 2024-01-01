@@ -15,8 +15,10 @@ const SongSchema = new mongoose.Schema({
   },
   songtype: {
     type: String,
-    default:'MP3',
   },
+  songpath:{
+    type :String ,
+  }
   
 });
 
