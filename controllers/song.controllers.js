@@ -4,22 +4,6 @@ import song  from "../dataModels/Song.model.js";
 
 
 
-export const getsong = async (req, res) => {
-  
-  const songowner=req.user.name
-  try {
-    const song=await song.find({user_name:songowner})
-    if(!song){
-      res.status(404).json({message:"This user has no project"})
-    }else{
-      res.status(200).json(song)
-    }
-      } catch (error) {
-    console.log("Error: ", error)
-    res.status(400).json({error: error.message})
-  }
-}
-
 
 
 
@@ -108,71 +92,6 @@ export const deletesong = async (req, res) => {
     res.json({ message: "Song information deleted successfully" });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: error.message });
-  }
-};
-
-
-
-
-// export const postMultipleSongs = async (req, res) => {
-//   try {
-//     if (!req.files) {
-//       return res.status(400).json({ message: 'No file provided' });
-//     }
-
-//     const song = req.files.map((file) => file.filename);
-//     const songID = req.params.id;
-//     const songInfo = await Song.findById(songID);
-   
-//     if (song) {
-//       songInfo.images = songID.images.concat(photo);
-//     }
-//     await songInfo.save();
-
-//     res.json({ message: 'Multiple images updated successfully' });
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
-
-
-
-
-
-
-
-// const postMultipleAudios = async (req, res) => {
-//   try {
-//     if (!req.files) {
-//       return res.status(400).json({ message: 'No file provided' });
-//     }
-
-//     const audio = req.files.map((file) => file.filename);
-//     const songID = req.params.id;
-//     const songInfo = await Song.findById(songID);
-       
-//     if (audio) {
-//       songInfo.audios = user.audios.concat(audio);
-//     }
-//     await songInfo.save();
-
-//     res.json({ message: 'Multiple audios updated successfully' });
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
-
-
-const getMultipleAudios = async (req, res) => {
-  try {
-
-    const projectID = req.params.id;
-    const projectInfo = await project.findById(projectID);
-    const audios= projectInfo.audios
-
-    res.json({ audios });
-  } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
