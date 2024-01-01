@@ -25,8 +25,10 @@ DONE
 
 ##  :ear_of_rice: Brief Overview : 
 ```
-A music streaming application that caters to both administrators and regular users. The system should allow users to create accounts, playlists, and save favorite songs
-Admins can update song information and delete songs. Regular users should be able to update their profiles and search for songs.
+A music streaming application that caters to both administrators and regular users.
+The system should allow users to create accounts, playlists, and save favorite songs
+Admins can update song information and delete songs. Regular users should be able to
+ update their profiles and search for songs.
  ```
 
 
@@ -68,7 +70,7 @@ Admins can update song information and delete songs. Regular users should be abl
 ### Step 1: Clone project
 
 ```sh
-[git clone https://github.com/](https://github.com/lomatul/InternConnect.git)
+[git clone https://github.com/lomatul/Musica.git)
 ```
 
 ## Step 2: Open it in VSCode / any other Editor
