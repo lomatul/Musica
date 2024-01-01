@@ -1,6 +1,6 @@
 # COURSE TITLE: Server Programming Lab :computer:
 # COURSE CODE: SWE 4538
-## PROJECT TITLE: Musica :ear_of_rice:
+## PROJECT TITLE: Musica :musical_score:
 
 ## Current Phase :
 ```
@@ -23,7 +23,7 @@ DONE
 
 
 
-##  :ear_of_rice: Brief Overview : 
+##  :trumpet: Brief Overview : :saxophone:
 ```
 A music streaming application that caters to both administrators and regular users.
 The system should allow users to create accounts, playlists, and save favorite songs
@@ -34,7 +34,7 @@ Admins can update song information and delete songs. Regular users should be abl
 
 
 
- ##  :cherries: CORE FEATURES : 
+ ##  :musical_note: CORE FEATURES : 
  ```
  1. User Management:
      * Users will be able to create accounts.
