@@ -8,7 +8,7 @@ export const getplaylist = async (req, res) => {
       return res.status(400).json({Error:"You are not Logged in. Login first"});
     }
     try {
-      const playlist=await project.find({user:playlistowner})
+      const playlist=await Playlist.find({user:playlistowner})
       if(!playlist){
         return res.status(404).json({message:"This user has no playlist"})
       }else{
@@ -21,18 +21,41 @@ export const getplaylist = async (req, res) => {
   }
 
 
-export  const postplaylist = async (req, res, next) => {
-    const { playlist_name, description } = req.body;
-    const playlistowner=req.user.id;
-    console.log(playlist_name);
+
+  export const playlistsongs = async (req, res) => {
+    const playlistid=req.params.id;
+    if(!playlistid){
+      return res.status(400).json({Error:"Playlist id not provided"});
+    }
+    try {
+      const playlist =await Playlist.find({user:playlistid})
+      if(!playlist){
+        return res.status(404).json({message:"playlist not found"})
+      }else{
+        const songs = playlist.songs;
+        return res.status(200).json(songs);
+      }
+        } catch (error) {
+      console.log("Error: ", error)
+      res.status(400).json({error: error.message})
+    }
+  }
+
+
+
+
+export  const postplaylist = async (req, res) => {
+    const { playlistname, description } = req.body;
+    const user=req.user.id;
+    console.log(playlistname);
     console.log(description);
-    console.log(playlistowner);
+    console.log(user);
     const errors = [];
   
-    if (!playlist_name || !description) {
+    if (!playlistname || !description) {
       errors.push("All fields are required!");
     }
-    if(!playlistowner){
+    if(!user){
       return res.status(400).json({Error:"You are not Logged in. Login first"});
     }
   
@@ -40,14 +63,15 @@ export  const postplaylist = async (req, res, next) => {
       res.status(400).json({ error: errors });
     } else {            
           const newPlaylist = new Playlist({
-            project_name,
+            playlistname,
             description,
-            playlistowner,
+            user,
+            
           });
           newPlaylist
             .save()
             .then(() => {
-              res.json({
+              res.status(200).json({
                 message: "Playlist created",
               });
             })
@@ -63,16 +87,16 @@ export  const postplaylist = async (req, res, next) => {
 
 export const updateplaylist = async (req, res) => {
         try {
-          const { playlist_name, description } = req.body;    
+          const { playlistname, description } = req.body;    
           const playlistId = req.params.id
           const playlist = await Playlist.findById(playlistId);
           console.log(playlist)
           if(!playlist){
             return res.status(404).json({message:"No such playlist found"})
           }      
-        if(playlist_name)
+        if(playlistname)
         {
-          playlist.playlistname = playlist_name;
+          playlist.playlistname = playlistname;
         }
       
         if(description)

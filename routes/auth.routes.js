@@ -10,11 +10,13 @@ import {
     getCallback,
     getScope,
     getProfile,
-    AdminRegister
+    AdminRegister,
+    AdminLogin
     } from "../controllers/auth.controllers.js";
 
 
 router.post("/login", postLogin)
+router.post("/adminlogin", AdminLogin)
 router.post("/register", postRegister);
 router.post("/adminregister", AdminRegister);
 router.get("/logout", logout);
@@ -22,7 +24,7 @@ router.get("/logout", logout);
 router.get("/profiles", getProfileInfos);
 router.get("/profiles/:id", getProfile);
 router.patch("/updateprofile/:id",  updateProfile);
-router.delete("/delete-profile/:id", deleteProfile);
+router.delete("/deleteprofile/:id", deleteProfile);
 
 router.get("/auth/google", getScope);
 router.get("/google/callback",getCallback);

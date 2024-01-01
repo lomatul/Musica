@@ -17,11 +17,6 @@ const SongSchema = new mongoose.Schema({
     type: String,
     default:'MP3',
   },
-  playlistname:{
-    type:String,
-    default:'',
-  }
-
   
 });
 

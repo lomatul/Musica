@@ -2,7 +2,7 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { Strategy as LocalStrategy } from 'passport-local';
 import bcrypt from 'bcrypt';
 import User from '../dataModels/User.model.js';
-
+import Admin from '../dataModels/admin.model.js';
 
 export function initializepassport  (passport, getUserByEmail, getUserById)  {
   const googleStrategy = new GoogleStrategy(
@@ -44,6 +44,29 @@ export function initializepassport  (passport, getUserByEmail, getUserById)  {
   passport.use('google', googleStrategy);
 
 
+  const authadmin= async (username, password, done) => {
+  
+    const user = await Admin.findOne({name: username })
+  
+    if (!user) {
+      return done(null, false, { message: 'Incorrect username.'});
+    }
+  
+    
+  
+    const match = await bcrypt.compare(password, user.password)
+    if (!match) {
+      return done(null, false, { message: 'Incorrect password.'});
+    }
+  
+    
+  
+    return done(null, user);
+  }
+  
+  passport.use('admin',
+    new LocalStrategy({usernameField: 'username', passwordField: 'password'},authadmin)
+  );
 
 
   const authenticateUser = async (email, password, done) => {
@@ -77,9 +100,19 @@ export function initializepassport  (passport, getUserByEmail, getUserById)  {
 
   passport.deserializeUser(async (id, done) => {
     try {
+     
       const user = await User.findById(id);
-      console.log(user);
-      done(null, user);
+      if(user)
+      {
+        console.log(user);
+        done(null, user);  
+      }
+      else {
+        const admin = await Admin.findById(id);
+        console.log(admin);
+        done(null, admin);
+      }
+      
     } catch (err) {
       done(err, null);
     }

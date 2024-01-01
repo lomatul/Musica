@@ -4,9 +4,6 @@ import song  from "../dataModels/Song.model.js";
 
 
 
-
-
-
 export const postSongFile = async (req, res) => {
   try {
     if (!req.file) {
@@ -62,13 +59,6 @@ export const updatesong = async (req, res) => {
     return res.status(500).json({ msg: err.message });
   }
 };
-
-
-
-
-
-
-
 
 
 
