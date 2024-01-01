@@ -15,13 +15,10 @@ const SongSchema = new mongoose.Schema({
   },
   songtype: {
     type: String,
-    default:'MP3',
   },
-  playlistname:{
-    type:String,
-    default:'',
+  songpath:{
+    type :String ,
   }
-
   
 });
 
