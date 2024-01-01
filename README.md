@@ -68,8 +68,7 @@ Admins can update song information and delete songs. Regular users should be abl
 ### Step 1: Clone project
 
 ```sh
-git clone https://github.com/
-cd website
+[git clone https://github.com/](https://github.com/lomatul/InternConnect.git)
 ```
 
 ## Step 2: Open it in VSCode / any other Editor
@@ -80,15 +79,11 @@ cd website
 ```sh
 npm install
 ```
+
+
+## :globe_with_meridians: Step 4: Run InternConnect in your local 
 ```sh
-yarn install
+Musica/npm start
 ```
-
-## Step 4: Run AgriGo in server mode
-
-```sh
-make serve
-```
-
 
 
